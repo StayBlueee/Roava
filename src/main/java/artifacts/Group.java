@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface Group {
     String getName();
-    List<Group> getRole(User user);
+    List<GroupRoles> getRole(User user);
 }
