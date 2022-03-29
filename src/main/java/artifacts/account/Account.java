@@ -22,6 +22,8 @@ public class Account {
         } catch (IOException e) {
             System.out.println("An error occurred while attempting to send your request!");
         }
+
+        return null;
     }
 
     public Account(String robloSecurity) {
