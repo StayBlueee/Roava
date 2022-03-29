@@ -1,11 +1,13 @@
 plugins {
     id 'java'
+    // For class name
+    id 'application'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
-
-
+// Main class name, Roava version, Java Version [currently 16]
+mainClassName = 'Main'
+version ''
+sourceCompatibility = JavaVersion.VERSION_16
 
 repositories {
     mavenCentral()
@@ -15,9 +17,6 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
-
 }
-
-test {
-    useJUnitPlatform()
-}
+// For emojis
+compileJava.options.encoding = 'UTF-8'
