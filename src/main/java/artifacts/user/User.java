@@ -1,6 +1,6 @@
 package artifacts.user;
 
-import artifacts.Group;
+import artifacts.groups.Group;
 
 import java.util.List;
 
