@@ -1,9 +1,13 @@
 package artifacts;
 
-public interface User {
+public interface UserInterface {
     String username();
     String userId();
     Long userIdLong();
+}
 
-
+public class User implements UserInterface {
+    String username;
+    String userId;
+    Long userIdLong;
 }
