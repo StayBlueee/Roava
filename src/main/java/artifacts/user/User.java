@@ -5,9 +5,9 @@ import artifacts.groups.Group;
 import java.util.List;
 
 interface UserInterface {
-    String getUsername();
-    String getUserId();
-    Long userIdLong();
+    String getUsername(User user);
+    String getUserId(User user);
+    Long userIdLong(User user);
     List<Group> groups();
 }
 
@@ -18,18 +18,18 @@ public class User implements UserInterface {
     List<Group> groups;
 
     @Override
-    public String getUsername() {
-        return username;
+    public String getUsername(User user) {
+        return user.getUsername(user);
     }
 
     @Override
-    public String getUserId() {
-        return userId;
+    public String getUserId(User user) {
+        return user.userId;
     }
 
     @Override
-    public Long userIdLong() {
-        return userIdLong;
+    public Long userIdLong(User user) {
+        return Long.parseLong(user.getUserId(user));
     }
 
     @Override
