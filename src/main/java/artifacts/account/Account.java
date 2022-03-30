@@ -21,13 +21,11 @@ public class Account {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Cookie", ".ROBLOSECURITY=" + this.robloSecurity)
                 .build();
-
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         } catch (IOException e) {
-            System.out.println("An error occurred while attempting to send your request!");
+            e.printStackTrace();
         }
-
         return null;
     }
 
@@ -49,7 +47,7 @@ public class Account {
             this.xsrfToken = response.header("x-csrf-token");
             this.robloSecurity = robloSecurity;
         } catch (IOException e) {
-            System.out.println("An error occurred while attempting to send your request!");
+            e.printStackTrace();
         }
     }
 }

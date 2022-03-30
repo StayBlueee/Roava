@@ -1,5 +1,6 @@
 package artifacts.user;
 
+import artifacts.account.Account;
 import artifacts.groups.Group;
 
 import java.util.List;
@@ -12,6 +13,7 @@ interface UserInterface {
 }
 
 public class User implements UserInterface {
+    Account account;
     String username;
     String userId;
     Long userIdLong;
