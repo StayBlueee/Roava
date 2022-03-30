@@ -1,13 +1,7 @@
 package artifacts.account;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import misc.Requester;
 import okhttp3.*;
-
-import java.io.IOException;
-import java.util.Locale;
 
 public class Account {
     private OkHttpClient client = new OkHttpClient().newBuilder()
