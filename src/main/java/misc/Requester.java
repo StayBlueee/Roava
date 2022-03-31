@@ -41,12 +41,12 @@ public class Requester {
         Builder builder = requestBuilder(url, method, body);
 
         if (account != null) {
-            if (account.robloSecurity != "") {
-                builder.addHeader("Cookie", ".ROBLOSECURITY=" + account.robloSecurity);
+            if (account.token != "") {
+                builder.addHeader("Cookie", ".ROBLOSECURITY=" + account.token);
             }
 
-            if (account.xsrfToken != "") {
-                builder.addHeader("X-CSRF-TOKEN", account.xsrfToken);
+            if (account.xcsrfToken != "") {
+                builder.addHeader("X-CSRF-TOKEN", account.xcsrfToken);
             }
         }
 
@@ -63,12 +63,12 @@ public class Requester {
         Builder builder = requestBuilder(url, method, body);
 
         if (account != null) {
-            if (account.robloSecurity != "") {
-                builder.addHeader("Cookie", ".ROBLOSECURITY=" + account.robloSecurity);
+            if (account.token != "") {
+                builder.addHeader("Cookie", ".ROBLOSECURITY=" + account.token);
             }
 
-            if (account.xsrfToken != "") {
-                builder.addHeader("X-CSRF-TOKEN", account.xsrfToken);
+            if (account.xcsrfToken != "") {
+                builder.addHeader("X-CSRF-TOKEN", account.xcsrfToken);
             }
         }
 
