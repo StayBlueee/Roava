@@ -14,17 +14,17 @@ public class Account {
     public String xsrfToken = "";
 
     public String getUserName() {
-        return Requester.sendRequestWithBody("https://www.roblox.com/mobileapi/userinfo", "GET", null, this).get("UserName").getAsString();
+        return Requester.sendRequestWithBody("https://www.roblox.com/mobileapi/userinfo", "GET", null).get("UserName").getAsString();
     }
 
     public int getUserId() {
-        Requester.sendRequestWithBody("https://www.roblox.com/mobileapi/userinfo", "GET", null, this).get("UserID").getAsInt();
+        Requester.sendRequestWithBody("https://www.roblox.com/mobileapi/userinfo", "GET", null).get("UserID").getAsInt();
 
         return 1;
     }
 
     public Response authenticate() {
-        return Requester.sendRequest("https://auth.roblox.com/v2/login", "POST", RequestBody.create("", JSON), this);
+        return Requester.sendRequest("https://auth.roblox.com/v2/login", "POST", RequestBody.create("", JSON));
     }
 
     public Account(String robloSecurity) {

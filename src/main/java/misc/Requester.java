@@ -37,7 +37,7 @@ public class Requester {
         return builder;
     }
 
-    public static Response sendRequest(String url, String method, RequestBody body, Account account) {
+    public static Response sendRequest(String url, String method, RequestBody body) {
         Builder builder = requestBuilder(url, method, body);
 
         if (account != null) {
@@ -59,7 +59,7 @@ public class Requester {
         return null;
     }
 
-    public static JsonObject sendRequestWithBody(String url, String method, RequestBody body, Account account) {
+    public static JsonObject sendRequestWithBody(String url, String method, RequestBody body) {
         Builder builder = requestBuilder(url, method, body);
 
         if (account != null) {
