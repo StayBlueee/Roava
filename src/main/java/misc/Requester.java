@@ -9,9 +9,19 @@ import okhttp3.Request.Builder;
 import java.io.IOException;
 
 public class Requester {
-    public static OkHttpClient client = new OkHttpClient().newBuilder()
+    private static OkHttpClient client = new OkHttpClient().newBuilder()
             .followRedirects(false)
             .build();
+
+    private static Account account;
+
+    public static void setAccount(Account setAccount) {
+        account = setAccount;
+    }
+
+    public static Account getAccount() {
+        return account;
+    }
 
     public static Builder requestBuilder(String url, String method, RequestBody body) {
         Builder builder = new Builder()
