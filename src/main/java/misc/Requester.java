@@ -9,7 +9,7 @@ import okhttp3.Request.Builder;
 import java.io.IOException;
 
 public class Requester {
-    private static OkHttpClient client = new OkHttpClient().newBuilder()
+    public static OkHttpClient client = new OkHttpClient().newBuilder()
             .followRedirects(false)
             .build();
 

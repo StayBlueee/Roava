@@ -7,14 +7,14 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 
 public class Account {
+    public String robloSecurity;
+    public String xsrfToken;
     private OkHttpClient client;
 
     private MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-    private String robloSecurity;
-    private String xsrfToken;
 
-    public String sendRequest(String url, RequestBody body) {
+    public String sendRequest(String url) {
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("X-CSRF-TOKEN", this.xsrfToken)
@@ -28,7 +28,6 @@ public class Account {
         }
         return null;
     }
-
     public Account(String robloSecurity) {
         this.client = new OkHttpClient().newBuilder()
                 .followRedirects(false)
