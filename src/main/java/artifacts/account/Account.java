@@ -1,52 +1,47 @@
 package artifacts.account;
 
+import misc.Requester;
 import okhttp3.*;
 
-import java.io.IOException;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-
 public class Account {
-    public String robloSecurity;
-    public String xsrfToken;
-    private OkHttpClient client;
+    private OkHttpClient client = new OkHttpClient().newBuilder()
+            .followRedirects(false)
+            .build();;
 
     private MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
+    public String robloSecurity = "";
+    public String xsrfToken = "";
 
-    public String sendRequest(String url) {
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("X-CSRF-TOKEN", this.xsrfToken)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Cookie", ".ROBLOSECURITY=" + this.robloSecurity)
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public String getUserName() {
+        return Requester.sendRequestWithBody("https://www.roblox.com/mobileapi/userinfo", "GET", null, this).get("UserName").getAsString();
     }
+
+    public int getUserId() {
+        Requester.sendRequestWithBody("https://www.roblox.com/mobileapi/userinfo", "GET", null, this).get("UserID").getAsInt();
+
+        return 1;
+    }
+
+    public Response authenticate() {
+        return Requester.sendRequest("https://auth.roblox.com/v2/login", "POST", RequestBody.create("", JSON), this);
+    }
+
     public Account(String robloSecurity) {
-        this.client = new OkHttpClient().newBuilder()
-                .followRedirects(false)
-                .build();
+        if (!robloSecurity.toLowerCase().startsWith("_|warning:-")) {
+            System.out.println("Your ROBLOSECURITY is not set properly. Please make sure that you include the entirety of the string, including the _|WARNING:-");
 
-        RequestBody body = RequestBody.create("", JSON);
+            return;
+        }
 
-        Request request = new Request.Builder()
-                .url("https://auth.roblox.com/v2/login")
-                .addHeader("Cookie", ".ROBLOSECURITY=" + robloSecurity)
-                .addHeader("Content-Type", "application/json")
-                .post(body)
-                .build();
+        this.robloSecurity = robloSecurity;
 
-        try (Response response = client.newCall(request).execute()) {
+        Response response = authenticate();
+
+        System.out.println(response.code());
+
+        if (response.header("x-csrf-token") != null) {
             this.xsrfToken = response.header("x-csrf-token");
-            this.robloSecurity = robloSecurity;
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
