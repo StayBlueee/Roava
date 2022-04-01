@@ -1,17 +1,17 @@
 package misc;
 
 import artifacts.account.Account;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import okhttp3.*;
-import okhttp3.Request.Builder;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import coresearch.cvurl.io.model.Response;
+import coresearch.cvurl.io.request.CVurl;
+import coresearch.cvurl.io.request.RequestBuilder;
 
-import java.io.IOException;
+
+import java.util.Map;
+import java.util.Optional;
 
 public class Requester {
-    private static OkHttpClient client = new OkHttpClient().newBuilder()
-            .followRedirects(false)
-            .build();
+    private static CVurl cVurl = new CVurl();
 
     private static Account account;
 
@@ -23,61 +23,49 @@ public class Requester {
         return account;
     }
 
-    public static Builder requestBuilder(String url, String method, RequestBody body) {
-        Builder builder = new Builder()
-                .addHeader("Content-Type", "application/json")
-                .url(url);
+    public static RequestBuilder requestBuilder(String url, String method, Map query) {
+        RequestBuilder builder = null;
 
         if (method == "POST") {
-            builder.post(body);
+            builder = cVurl.post(url);
         } else if (method == "GET") {
-            builder.get();
+            builder = cVurl.get(url);
+        }
+
+        if (account != null) {
+            if (account.token != "") {
+                builder.header("Cookie", ".ROBLOSECURITY=" + account.token);
+            }
+
+            if (account.xcsrfToken != "") {
+                builder.header("X-CSRF-TOKEN", account.xcsrfToken);
+            }
+        }
+
+        if (query != null) {
+            builder.queryParams(query);
         }
 
         return builder;
     }
 
-    public static Response sendRequest(String url, String method, RequestBody body) {
-        Builder builder = requestBuilder(url, method, body);
+    public static Response<String> sendRequest(String url, String method, Map query) throws RuntimeException {
+        RequestBuilder builder = requestBuilder(url, method, query);
 
-        if (account != null) {
-            if (account.token != "") {
-                builder.addHeader("Cookie", ".ROBLOSECURITY=" + account.token);
-            }
+        var response = builder.asString();
 
-            if (account.xcsrfToken != "") {
-                builder.addHeader("X-CSRF-TOKEN", account.xcsrfToken);
-            }
+        if (response.isPresent()) {
+            return (Response<String>) response.get();
+        } else {
+            throw new RuntimeException("An error has occurred while processing your request!");
         }
-
-        try (Response response = client.newCall(builder.build()).execute()) {
-            return response;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
-    public static JsonObject sendRequestWithBody(String url, String method, RequestBody body) {
-        Builder builder = requestBuilder(url, method, body);
+    public static ObjectNode sendRequestJSON(String url, String method, Map query) {
+        RequestBuilder builder = requestBuilder(url, method, query);
 
-        if (account != null) {
-            if (account.token != "") {
-                builder.addHeader("Cookie", ".ROBLOSECURITY=" + account.token);
-            }
+        ObjectNode response = (ObjectNode) builder.asObject(ObjectNode.class);
 
-            if (account.xcsrfToken != "") {
-                builder.addHeader("X-CSRF-TOKEN", account.xcsrfToken);
-            }
-        }
-
-        try (Response response = client.newCall(builder.build()).execute()) {
-            return JsonParser.parseString(response.body().string()).getAsJsonObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return response;
     }
 }
