@@ -8,7 +8,6 @@ import coresearch.cvurl.io.request.RequestBuilder;
 
 
 import java.util.Map;
-import java.util.Optional;
 
 public class Requester {
     private static CVurl cVurl = new CVurl();
@@ -33,11 +32,11 @@ public class Requester {
         }
 
         if (account != null) {
-            if (account.token != "") {
+            if (!account.token.equals("")) {
                 builder.header("Cookie", ".ROBLOSECURITY=" + account.token);
             }
 
-            if (account.xcsrfToken != "") {
+            if (!account.xcsrfToken.equals("")) {
                 builder.header("X-CSRF-TOKEN", account.xcsrfToken);
             }
         }
@@ -55,17 +54,27 @@ public class Requester {
         var response = builder.asString();
 
         if (response.isPresent()) {
-            return (Response<String>) response.get();
+            var result = (Response<String>) response.get();
+
+            if (account != null) {
+                String xcsrfToken = result.headers().firstValue("X-CSRF-TOKEN").get();
+
+                if (!xcsrfToken.equals("")) {
+                    account.xcsrfToken = xcsrfToken;
+                }
+            }
+
+            return result;
         } else {
-            throw new RuntimeException("An error has occurred while processing your request!");
+            throw new RuntimeException("An error has occurred while processing your request.");
         }
     }
 
     public static ObjectNode sendRequestJSON(String url, String method, Map query) {
         RequestBuilder builder = requestBuilder(url, method, query);
 
-        ObjectNode response = (ObjectNode) builder.asObject(ObjectNode.class);
+        ObjectNode result = (ObjectNode) builder.asObject(ObjectNode.class);
 
-        return response;
+        return result;
     }
 }
