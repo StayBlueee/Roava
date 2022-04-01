@@ -1,49 +1,22 @@
 package artifacts.account;
 
 import artifacts.exceptions.TokenNotValidException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import misc.Requester;
-import okhttp3.*;
-
-import java.io.IOException;
 
 public class Account {
-    private OkHttpClient client = new OkHttpClient().newBuilder()
-            .followRedirects(false)
-            .build();
-
-    private MediaType json = MediaType.get("application/json; charset=utf-8");
-
-    private int retries = 0;
+    private String userName = "";
+    private long userId = 0;
 
     public String xcsrfToken = "";
     public String token = "";
 
     public String getUserName() {
-        return Requester.sendRequestWithBody("https://www.roblox.com/my/profile", "GET", null).get("Username").getAsString();
+        return userName;
     }
 
-    public int getUserId() {
-        return Requester.sendRequestWithBody("https://www.roblox.com/my/profile", "GET", null).get("UserID").getAsInt();
-    }
-
-    public Response authenticate() throws TokenNotValidException {
-        Response response = Requester.sendRequest("https://auth.roblox.com/v2/login", "POST", RequestBody.create("", json));
-
-        if (response.code() == 403) {
-            if (retries < 2) {
-                if (response.header("x-csrf-token") != null) {
-                    this.xcsrfToken = response.header("x-csrf-token");
-                }
-
-                retries++;
-
-                return authenticate();
-            } else {
-                throw new TokenNotValidException("Yes");
-            }
-        }
-
-        return response;
+    public long getUserId() {
+        return userId;
     }
 
     public Account(String token) throws TokenNotValidException {
@@ -57,26 +30,13 @@ public class Account {
 
         Requester.setAccount(this);
 
-        Response response = Requester.sendRequest("https://www.roblox.com/my/profile", "GET", null);
+        try {
+            ObjectNode result = Requester.sendRequestJSON("https://www.roblox.com/my/profile", "GET", null);
 
-        if (!response.header("content-type").equals("application/json; charset=utf-8")) {
+            this.userName = result.get("Username").asText();
+            this.userId = result.get("UserId").asLong();
+        } catch (Exception exception) {
             throw new TokenNotValidException("The token you have provided is invalid!");
         }
-
-        try {
-            System.out.println(response.body().string());
-        } catch (IOException e) {
-
-        }
-
-        try {
-            response = authenticate();
-        } catch(TokenNotValidException e) {
-            System.out.println(e);
-
-            return;
-        }
-
-        System.out.println(response.code());
     }
 }
