@@ -10,19 +10,19 @@ import coresearch.cvurl.io.request.RequestBuilder;
 import java.util.Map;
 
 public class Requester {
-    private static CVurl cVurl = new CVurl();
+    private  CVurl cVurl = new CVurl();
 
-    private static Account account;
+    private  Account account;
 
-    public static void setAccount(Account setAccount) {
+    public  void setAccount(Account setAccount) {
         account = setAccount;
     }
 
-    public static Account getAccount() {
+    public  Account getAccount() {
         return account;
     }
 
-    public static RequestBuilder requestBuilder(String url, String method, Map query) {
+    public  RequestBuilder requestBuilder(String url, String method, Map query) {
         RequestBuilder builder = null;
 
         if (method == "POST") {
@@ -48,7 +48,7 @@ public class Requester {
         return builder;
     }
 
-    public static Response<String> sendRequest(String url, String method, Map query) throws RuntimeException {
+    public  Response<String> sendRequest(String url, String method, Map query) throws RuntimeException {
         RequestBuilder builder = requestBuilder(url, method, query);
 
         var response = builder.asString();
@@ -70,7 +70,7 @@ public class Requester {
         }
     }
 
-    public static ObjectNode sendRequestJSON(String url, String method, Map query) {
+    public  ObjectNode sendRequestJSON(String url, String method, Map query) {
         RequestBuilder builder = requestBuilder(url, method, query);
 
         ObjectNode result = (ObjectNode) builder.asObject(ObjectNode.class);
