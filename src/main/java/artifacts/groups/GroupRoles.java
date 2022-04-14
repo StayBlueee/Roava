@@ -1,5 +1,7 @@
 package artifacts.groups;
 
+import artifacts.exceptions.GroupIdNotValid;
+
 interface GroupRolesInterface {
     String getRoleId();
     String getName();
@@ -7,27 +9,36 @@ interface GroupRolesInterface {
     Long getRoleIdLong();
 }
 public class GroupRoles implements GroupRolesInterface {
-    String roleId;
-    String name;
-    String rank;
-    Long roleIdLong;
+    String groupId;
+    public GroupRoles(String groupId) throws GroupIdNotValid {
+        this.groupId = groupId;
+
+        try {
+            // request
+        } catch (Exception ex) {
+            throw new GroupIdNotValid("The GroupID is not valid.");
+        }
+
+    }
+
+
     @Override
     public String getRoleId() {
-        return roleId;
+        return null;
     }
 
     @Override
     public String getName() {
-        return name;
+        return null;
     }
 
     @Override
     public String getRank() {
-        return rank;
+        return null;
     }
 
     @Override
     public Long getRoleIdLong() {
-        return roleIdLong;
+        return null;
     }
 }

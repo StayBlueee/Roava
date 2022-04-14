@@ -13,10 +13,6 @@ public class Account {
     public static String token = "";
 
 
-    public long getUserId() {
-        return userId;
-    }
-
     public void setAccount(String cookie) throws TokenNotValidException {
         Requester req = new Requester();
         Account.token = cookie;

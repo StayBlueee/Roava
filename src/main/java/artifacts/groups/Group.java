@@ -10,7 +10,6 @@ import java.util.List;
 interface GroupInterface {
     String getName();
     String getDescription();
-    String getId();
     User getOwner();
     int getMemberCount();
     String getCreated();
@@ -41,10 +40,6 @@ public class Group implements GroupInterface {
         return result.get("description").asText();
     }
 
-    @Override
-    public String getId() {
-        return result.get("id").asText();
-    }
 
     @Override
     public User getOwner() {
