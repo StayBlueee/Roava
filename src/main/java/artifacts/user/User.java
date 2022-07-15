@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 public class User {
     private String username;
-    private long userId;
+    private int userId;
     private Requester requester = new Requester();
 
-    public User(long userId) {
+    public User(int userId) {
         ObjectNode object = requester.sendRequestJson(String.format("https://users.roblox.com/v1/users/%d", userId), "GET", "");
 
         if (object.get("name").isTextual()) {
@@ -28,7 +28,7 @@ public class User {
 
         if (object.get("data").isArray() && object.get("data").size() > 0) {
             this.username = username;
-            this.userId = object.get("data").get(0).get("id").asLong();
+            this.userId = object.get("data").get(0).get("id").asInt();
         } else {
             throw new RuntimeException("The provided username is invalid!");
         }
@@ -38,18 +38,18 @@ public class User {
         return this.username;
     }
 
-    public long getUserId() {
+    public int getUserId() {
         return this.userId;
     }
 
     public ArrayList<Group> getGroups() {
-        ArrayList<Group> groups = new ArrayList<Group>();
+        ArrayList<Group> groups = new ArrayList<>();
 
         ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/users/%d/groups/roles", this.userId), "GET", "");
 
         if (object.get("data").isArray() && object.get("data").size() > 0) {
             for (JsonNode array : object.get("data")) {
-                groups.add(new Group(array.get("group").get("id").asLong()));
+                groups.add(new Group(array.get("group").get("id").asInt()));
             }
         }
 

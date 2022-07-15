@@ -56,7 +56,7 @@ public class Requester {
         return builder;
     }
 
-    private Response<String> sendRequest(String url, String method, String body, Map query, int counter) throws RuntimeException {
+    private Response<String> sendRequest(String url, String method, String body, Map query, int counter) throws Exception {
         RequestBuilder builder = requestBuilder(url, method, body, query);
 
         Optional response = builder.asString();
@@ -86,15 +86,15 @@ public class Requester {
         throw new RuntimeException("An error has occurred while processing your request.");
     }
 
-    public Response<String> sendRequest(String url, String method, String body, Map query) throws RuntimeException {
+    public Response<String> sendRequest(String url, String method, String body, Map query) throws Exception {
         return sendRequest(url, method, body, query, 0);
     }
 
-    public Response<String> sendRequest(String url, String method, String body) throws RuntimeException {
+    public Response<String> sendRequest(String url, String method, String body) throws Exception {
         return sendRequest(url, method, body, null, 0);
     }
 
-    public Response<String> sendRequest(String url, String method) throws RuntimeException {
+    public Response<String> sendRequest(String url, String method) throws Exception {
         return sendRequest(url, method, null, null, 0);
     }
 

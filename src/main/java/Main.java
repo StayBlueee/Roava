@@ -10,13 +10,12 @@ public class Main {
         Account account;
 
         try {
-            account = new Account(null);
+            account = new Account("");
         } catch (TokenNotValidException e) {
             System.out.println(e.getMessage());
 
             return;
         }
-
 
         System.out.println("Logged in as " + account.getUserName() + " with user ID " + account.getUserId());
     }
