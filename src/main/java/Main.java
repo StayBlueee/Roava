@@ -2,8 +2,6 @@ import artifacts.account.Account;
 import artifacts.exceptions.TokenNotValidException;
 import artifacts.groups.Group;
 import artifacts.user.User;
-import coresearch.cvurl.io.model.Response;
-import misc.Requester;
 
 import java.util.ArrayList;
 
@@ -15,6 +13,7 @@ public class Main {
             account = new Account(null);
         } catch (TokenNotValidException e) {
             System.out.println(e.getMessage());
+
             return;
         }
 
