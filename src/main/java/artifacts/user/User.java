@@ -1,39 +1,59 @@
 package artifacts.user;
 
 import artifacts.groups.Group;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import misc.Requester;
 
-import java.util.List;
+import java.util.ArrayList;
 
-interface UserInterface {
-    String getUsername(User user);
-    String getUserId(User user);
-    Long userIdLong(User user);
-    List<Group> groups();
-}
+public class User {
+    private String username;
+    private long userId;
+    private Requester requester = new Requester();
 
-public class User implements UserInterface {
-    String username;
-    String userId;
-    Long userIdLong;
-    List<Group> groups;
+    public User(long userId) {
+        ObjectNode object = requester.sendRequestJson(String.format("https://users.roblox.com/v1/users/%d", userId), "GET", "");
 
-    @Override
+        if (object.get("name").isTextual()) {
+            this.username = object.get("name").asText();
+            this.userId = userId;
+        } else {
+            throw new RuntimeException("The provided user ID is invalid!");
+        }
+    }
+
+    public User(String username) {
+        ObjectNode object = requester.sendRequestJson("https://users.roblox.com/v1/usernames/users", "POST", String.format("{\"usernames\": [\"%s\"]}", username));
+
+        if (object.get("data").isArray() && object.get("data").size() > 0) {
+            this.username = username;
+            this.userId = object.get("data").get(0).get("id").asLong();
+        } else {
+            throw new RuntimeException("The provided username is invalid!");
+        }
+    }
+
     public String getUsername(User user) {
-        return user.getUsername(user);
+        return this.username;
     }
 
-    @Override
-    public String getUserId(User user) {
-        return user.userId;
+    public long getUserId(User user) {
+        return this.userId;
     }
 
-    @Override
-    public Long userIdLong(User user) {
-        return Long.parseLong(user.getUserId(user));
-    }
+    public ArrayList<Group> getGroups() {
+        ArrayList<Group> groups = new ArrayList<Group>();
 
-    @Override
-    public List<Group> groups() {
+        ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/users/%d/groups/roles", this.userId), "GET", "");
+
+        if (object.get("data").isArray() && object.get("data").size() > 0) {
+            for (JsonNode array : object.get("data")) {
+                groups.add(new Group(array.get("group").get("id").asLong()));
+            }
+        }
+
         return groups;
     }
 }

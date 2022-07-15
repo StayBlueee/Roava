@@ -6,30 +6,34 @@ import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.CVurl;
 import coresearch.cvurl.io.request.RequestBuilder;
 
-
 import java.util.Map;
+import java.util.Optional;
 
 public class Requester {
-    private static CVurl cVurl = new CVurl();
+    private CVurl cVurl = new CVurl();
 
-    private static Account account;
+    private Account account;
 
-    public static void setAccount(Account setAccount) {
-        account = setAccount;
+    public Requester(Account account) {
+        this.account = account;
     }
 
-    public static Account getAccount() {
-        return account;
-    }
+    public Requester() {}
 
-    public static RequestBuilder requestBuilder(String url, String method, Map query) {
+    public RequestBuilder requestBuilder(String url, String method, String body, Map query) {
         RequestBuilder builder = null;
 
-        if (method == "POST") {
-            builder = cVurl.post(url);
-        } else if (method == "GET") {
+        if (method.equals("POST")) {
+            builder = cVurl.post(url).body(body);
+        } else if (method.equals("PATCH")) {
+            builder = cVurl.patch(url).body(body);
+        } else if (method.equals("DELETE")) {
+            builder = cVurl.delete(url).body(body);
+        } else if (method.equals("GET")) {
             builder = cVurl.get(url);
         }
+
+        builder.header("Content-Type", "application/json");
 
         if (account != null) {
             if (!account.token.equals("")) {
@@ -48,30 +52,50 @@ public class Requester {
         return builder;
     }
 
-    public static Response<String> sendRequest(String url, String method, Map query) throws RuntimeException {
-        RequestBuilder builder = requestBuilder(url, method, query);
+    private Response<String> sendRequest(String url, String method, String body, Map query, int counter) throws RuntimeException {
+        RequestBuilder builder = requestBuilder(url, method, body, query);
 
-        var response = builder.asString();
+        Optional response = builder.asString();
+
+        if (counter > 3) {
+            throw new RuntimeException("Too many failed attempts at getting the X-CSRF-TOKEN. Maybe something is wrong with Roblox?");
+        }
 
         if (response.isPresent()) {
             var result = (Response<String>) response.get();
 
             if (account != null) {
-                String xcsrfToken = result.headers().firstValue("X-CSRF-TOKEN").get();
+                Optional<String> xcsrfToken = result.headers().firstValue("X-CSRF-TOKEN");
 
-                if (!xcsrfToken.equals("")) {
-                    account.xcsrfToken = xcsrfToken;
+                if (xcsrfToken.isPresent()) {
+                    account.xcsrfToken = xcsrfToken.get();
                 }
+            }
+            // Re-send the request with the now valid X-CSRF-TOKEN
+            if (result.status() == 403) {
+                return sendRequest(url, method, body, query, counter + 1);
             }
 
             return result;
-        } else {
-            throw new RuntimeException("An error has occurred while processing your request.");
         }
+
+        throw new RuntimeException("An error has occurred while processing your request.");
     }
 
-    public static ObjectNode sendRequestJSON(String url, String method, Map query) {
-        RequestBuilder builder = requestBuilder(url, method, query);
+    public Response<String> sendRequest(String url, String method, String body, Map query) throws RuntimeException {
+        return sendRequest(url, method, body, query, 0);
+    }
+
+    public Response<String> sendRequest(String url, String method, String body) throws RuntimeException {
+        return sendRequest(url, method, body, null, 0);
+    }
+
+    public Response<String> sendRequest(String url, String method) throws RuntimeException {
+        return sendRequest(url, method, null, null, 0);
+    }
+
+    public ObjectNode sendRequestJson(String url, String method, String body) {
+        RequestBuilder builder = requestBuilder(url, method, body, null);
 
         ObjectNode result = (ObjectNode) builder.asObject(ObjectNode.class);
 

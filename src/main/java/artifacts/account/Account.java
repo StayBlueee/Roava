@@ -1,6 +1,7 @@
 package artifacts.account;
 
 import artifacts.exceptions.TokenNotValidException;
+import artifacts.user.User;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import misc.Requester;
 
@@ -8,6 +9,7 @@ public class Account {
     private String userName = "";
     private long userId = 0;
 
+    public Requester requester = null;
     public String xcsrfToken = "";
     public String token = "";
 
@@ -27,11 +29,12 @@ public class Account {
         }
 
         this.token = token;
+        this.requester = new Requester(this);
 
-        Requester.setAccount(this);
+        User user = new User("3oq");
 
         try {
-            ObjectNode result = Requester.sendRequestJSON("https://www.roblox.com/my/profile", "GET", null);
+            ObjectNode result = this.requester.sendRequestJson("https://www.roblox.com/my/profile", "GET", "");
 
             this.userName = result.get("Username").asText();
             this.userId = result.get("UserId").asLong();
