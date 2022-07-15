@@ -1,5 +1,6 @@
 package artifacts.groups;
 
+import artifacts.account.Account;
 import artifacts.user.User;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import misc.Requester;
@@ -20,6 +21,10 @@ public class Group {
         } else {
             throw new RuntimeException("The provided group ID is invalid!");
         }
+    }
+
+    public void setAccount(Account account) {
+        this.requester.setAccount(account);
     }
 
     public String getName() {

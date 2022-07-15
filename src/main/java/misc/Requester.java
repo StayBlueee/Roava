@@ -20,6 +20,10 @@ public class Requester {
 
     public Requester() {}
 
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
     public RequestBuilder requestBuilder(String url, String method, String body, Map query) {
         RequestBuilder builder = null;
 
