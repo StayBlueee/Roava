@@ -3,6 +3,7 @@ package artifacts.groups;
 import artifacts.account.Account;
 import artifacts.user.User;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import coresearch.cvurl.io.model.Response;
 import misc.Requester;
 
 import java.util.List;
@@ -25,6 +26,13 @@ public class Group {
 
     public void setAccount(Account account) {
         this.requester.setAccount(account);
+    }
+
+    public void rankUser(User user, Long roleset) throws Exception {
+        Response<String> t = requester.sendRequest(String.format("https://groups.roblox.com/v1/groups/%d/users/%d", this.groupId, user.getUserId()), "PATCH", String.format("{\"roleId\":" + roleset + "}"));
+        if(!t.isSuccessful()) {
+            throw new Exception(t.getBody());
+        }
     }
 
     public String getName() {

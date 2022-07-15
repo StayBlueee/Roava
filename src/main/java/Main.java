@@ -8,23 +8,16 @@ import misc.Requester;
 import java.util.ArrayList;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Account account;
 
         try {
-            account = new Account("");
+            account = new Account(null);
         } catch (TokenNotValidException e) {
             System.out.println(e.getMessage());
             return;
         }
 
-        User user = new User(1);
-
-        ArrayList<Group> groups = user.getGroups();
-
-        for (Group group : groups) {
-            System.out.println(group.getId() + " " + group.getName());
-        }
 
         System.out.println("Logged in as " + account.getUserName() + " with user ID " + account.getUserId());
     }

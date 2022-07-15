@@ -35,11 +35,11 @@ public class User {
         }
     }
 
-    public String getUsername(User user) {
+    public String getUsername() {
         return this.username;
     }
 
-    public long getUserId(User user) {
+    public long getUserId() {
         return this.userId;
     }
 
