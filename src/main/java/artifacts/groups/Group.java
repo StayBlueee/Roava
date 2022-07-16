@@ -1,6 +1,8 @@
 package artifacts.groups;
 
 import artifacts.account.Account;
+import artifacts.exceptions.GroupException;
+import artifacts.exceptions.RequestException;
 import artifacts.user.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -15,14 +17,14 @@ public class Group {
     private Account account;
     private Requester requester = new Requester();
 
-    public Group(int groupId) {
+    public Group(int groupId) throws GroupException {
         ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/groups?groupIds=%d", groupId), "GET", "");
 
         if (object.get("data").isArray() && object.get("data").size() > 0) {
             this.groupId = groupId;
             this.name = object.get("data").get(0).get("name").asText();
         } else {
-            throw new RuntimeException("The provided group ID is invalid!");
+            throw new GroupException("The provided group ID is invalid!");
         }
     }
 
@@ -85,31 +87,31 @@ public class Group {
         throw new Exception("The provided role does not exist!");
     }
 
-    public void rankUser(int userId, int roleSet) throws Exception {
+    public void rankUser(int userId, int roleSet) throws GroupException, RequestException {
         if (account == null) {
-            throw new Exception("No account has been provided!");
+            throw new GroupException("No account has been provided!");
         }
 
         Response<String> response = requester.sendRequest(String.format("https://groups.roblox.com/v1/groups/%d/users/%d", this.groupId, userId), "PATCH", String.format("{\"roleId\":" + roleSet + "}"));
 
         if (!response.isSuccessful()) {
-            throw new Exception("Could not rank the provided user!");
+            throw new GroupException("Could not rank the provided user!");
         }
     }
 
-    public void rankUser(User user, int roleSet) throws Exception {
+    public void rankUser(User user, int roleSet) throws GroupException, RequestException {
         this.rankUser(user.getUserId(), roleSet);
     }
 
-    public void exileUser(int userId) throws Exception {
+    public void exileUser(int userId) throws GroupException, RequestException {
         if (account == null) {
-            throw new Exception("No account has been provided!");
+            throw new GroupException("No account has been provided!");
         }
 
         Response<String> response = requester.sendRequest(String.format("https://groups.roblox.com/v1/groups/%d/users/%d", this.groupId, userId), "DELETE");
 
         if (!response.isSuccessful()) {
-            throw new Exception("Could not rank the provided user!");
+            throw new GroupException("Could not rank the provided user!");
         }
     }
 

@@ -1,9 +1,5 @@
 import artifacts.account.Account;
-import artifacts.exceptions.TokenNotValidException;
-import artifacts.groups.Group;
-import artifacts.user.User;
-
-import java.util.ArrayList;
+import artifacts.exceptions.AccountException;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -11,7 +7,7 @@ public class Main {
 
         try {
             account = new Account("");
-        } catch (TokenNotValidException e) {
+        } catch (AccountException e) {
             System.out.println(e.getMessage());
 
             return;
