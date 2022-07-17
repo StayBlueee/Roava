@@ -24,9 +24,12 @@ public class Requester {
         this.account = account;
     }
 
+    public Account getAccount() { return this.account; }
+
     public RequestBuilder requestBuilder(String url, String method, String body, Map query) {
         RequestBuilder builder = null;
 
+        // Set the method and body (for requests other than GET)
         if (method.equals("POST")) {
             builder = cVurl.post(url).body(body);
         } else if (method.equals("PATCH")) {
@@ -37,19 +40,24 @@ public class Requester {
             builder = cVurl.get(url);
         }
 
+        // JSON header
         builder.header("Content-Type", "application/json");
 
-        if (account != null) {
-            if (!account.cookie.equals("")) {
-                builder.header("Cookie", ".ROBLOSECURITY=" + account.cookie);
+        // Check if there is a valid account
+        if (this.account != null) {
+            // Set the cookie
+            if (!this.account.cookie.equals("")) {
+                builder.header("Cookie", ".ROBLOSECURITY=" + this.account.cookie);
             }
 
-            if (!account.token.equals("")) {
-                builder.header("X-CSRF-TOKEN", account.token);
+            // Set the token
+            if (!this.account.token.equals("")) {
+                builder.header("X-CSRF-TOKEN", this.account.token);
             }
         }
 
         if (query != null) {
+            // Set parameters
             builder.queryParams(query);
         }
 
@@ -68,11 +76,13 @@ public class Requester {
         if (response.isPresent()) {
             var result = (Response<String>) response.get();
 
-            if (account != null) {
+            if (this.account != null) {
+                // Set the X-CSRF-TOKEN
                 Optional<String> token = result.headers().firstValue("X-CSRF-TOKEN");
 
+                // Check if the token is present
                 if (token.isPresent()) {
-                    account.token = token.get();
+                    this.account.token = token.get();
                 }
             }
             // Re-send the request with the now valid X-CSRF-TOKEN
@@ -98,6 +108,7 @@ public class Requester {
         return sendRequest(url, method, null, null, 0);
     }
 
+    // Get a JSON Object instead of a normal one (THIS NEEDS TO BE RE-WRITTEN).
     public ObjectNode sendRequestJson(String url, String method, String body) {
         RequestBuilder builder = requestBuilder(url, method, body, null);
 
