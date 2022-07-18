@@ -5,7 +5,7 @@ public class GroupRole {
     private int roleRank;
     private String roleName;
 
-    protected GroupRole(int roleId, int roleRank, String roleName) {
+    public GroupRole(int roleId, int roleRank, String roleName) {
         this.roleId = roleId;
         this.roleRank = roleRank;
         this.roleName = roleName;

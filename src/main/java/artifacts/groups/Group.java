@@ -112,7 +112,7 @@ public class Group {
         Response<String> response = requester.sendRequest(String.format("https://groups.roblox.com/v1/groups/%d/users/%d", this.groupId, userId), "PATCH", String.format("{\"roleId\":%d}", roleSet));
 
         if (!response.isSuccessful()) {
-            throw new GroupException("Could not rank the provided user!");
+            throw new GroupException("Could not rank the provided user! " + response.status() + ": " + response.getBody());
         }
     }
 

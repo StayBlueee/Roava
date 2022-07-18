@@ -3,6 +3,7 @@ package artifacts.user;
 import artifacts.exceptions.GroupException;
 import artifacts.exceptions.UserException;
 import artifacts.groups.Group;
+import artifacts.groups.GroupRole;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import misc.Requester;
@@ -57,4 +58,38 @@ public class User {
 
         return groups;
     }
+
+    // 99.9% sure this wont work
+    public GroupRole getRankInGroup(Group group) throws GroupException {
+        ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/users/%d/groups/roles", group.getId()), "GET", "");
+
+        if (object.get("data").isArray() && object.get("data").size() > 0) {
+            for (JsonNode array : object.get("data")) {
+                if (array.get("group").get("id").asInt() == group.getGroupRole(this.getUsername()).getRoleId()) {
+                    if(object.get("role").isArray()) {
+                        return new GroupRole(array.get("id").asInt(), array.get("rank").asInt(), array.get("name").asText());
+                    }
+                }
+            }
+            return null;
+        }
+        throw new GroupException("The provided user is not in the provided group!");
+    }
+    public GroupRole getRankInGroup(int groupId) throws GroupException {
+        Group group = new Group(groupId);
+        ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/users/%d/groups/roles", group.getId()), "GET", "");
+
+        if (object.get("data").isArray() && object.get("data").size() > 0) {
+            for (JsonNode array : object.get("data")) {
+                if (array.get("group").get("id").asInt() == group.getGroupRole(this.getUsername()).getRoleId()) {
+                    if(object.get("role").isArray()) {
+                        return new GroupRole(array.get("id").asInt(), array.get("rank").asInt(), array.get("name").asText());
+                    }
+                }
+            }
+            return null;
+        }
+        throw new GroupException("The provided user is not in the provided group!");
+    }
+
 }
