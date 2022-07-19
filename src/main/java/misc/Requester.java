@@ -1,30 +1,38 @@
 package misc;
 
-import artifacts.account.Account;
+import artifacts.client.Client;
 import artifacts.exceptions.RequestException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.CVurl;
 import coresearch.cvurl.io.request.RequestBuilder;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 
 public class Requester {
     private CVurl cVurl = new CVurl();
-    private Account account;
+    private Client client;
+    private static ArrayList<Client> clients = new ArrayList<>();
 
-    public Requester(Account account) {
-        this.account = account;
+    public Requester(Client client) {
+        this.setAccount(client);
     }
 
     public Requester() {}
 
-    public void setAccount(Account account) {
-        this.account = account;
+    public void setAccount(Client client) {
+        if (!clients.contains(client)) {
+            clients.add(client);
+        }
+
+        this.client = client;
     }
 
-    public Account getAccount() { return this.account; }
+    public Client getAccount() {
+        return clients.size() == 1 ? clients.get(0) : this.client;
+    }
 
     public RequestBuilder requestBuilder(String url, String method, String body, Map query) {
         RequestBuilder builder = null;
@@ -44,15 +52,15 @@ public class Requester {
         builder.header("Content-Type", "application/json");
 
         // Check if there is a valid account
-        if (this.account != null) {
+        if (this.client != null) {
             // Set the cookie
-            if (!this.account.cookie.equals("")) {
-                builder.header("Cookie", ".ROBLOSECURITY=" + this.account.cookie);
+            if (!this.client.cookie.equals("")) {
+                builder.header("Cookie", ".ROBLOSECURITY=" + this.client.cookie);
             }
 
             // Set the token
-            if (!this.account.token.equals("")) {
-                builder.header("X-CSRF-TOKEN", this.account.token);
+            if (!this.client.token.equals("")) {
+                builder.header("X-CSRF-TOKEN", this.client.token);
             }
         }
 
@@ -76,21 +84,17 @@ public class Requester {
         if (response.isPresent()) {
             var result = (Response<String>) response.get();
 
-            if (this.account != null) {
+            if (this.client != null) {
                 // Set the X-CSRF-TOKEN
                 Optional<String> token = result.headers().firstValue("X-CSRF-TOKEN");
 
                 // Check if the token is present
                 if (token.isPresent()) {
-                    this.account.token = token.get();
+                    this.client.token = token.get();
                 }
             }
-            // Re-send the request with the now valid X-CSRF-TOKEN
-            if (result.status() == 403) {
-                return sendRequest(url, method, body, query, counter + 1);
-            }
-
-            return result;
+            // If the request returns a 403, re-send the request with the now valid X-CSRF-TOKEN
+            return result.status() == 403 ? sendRequest(url, method, body, query, counter + 1) : result;
         }
 
         throw new RequestException("An error has occurred while processing your request.");

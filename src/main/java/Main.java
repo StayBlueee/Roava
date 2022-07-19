@@ -1,18 +1,36 @@
-import artifacts.account.Account;
+import artifacts.client.Client;
 import artifacts.exceptions.AccountException;
+import artifacts.exceptions.GroupException;
+import artifacts.exceptions.RequestException;
 import artifacts.groups.Group;
-import artifacts.user.User;
 
 public class Main {
     public static void main(String[] args) {
-        Account account;
-try {
-            account = new Account("cookie");
+        Client client;
+
+        try {
+            client = new Client("");
         } catch (AccountException e) {
             System.out.println(e.getMessage());
             return;
         }
 
-        System.out.println("Logged in as " + account.getUserName() + " with user ID " + account.getUserId());
+        try {
+            Group group = new Group(1);
+
+            group.rankUser(1, "Guest");
+
+            System.out.println("Successfully ranked user!");
+        } catch (GroupException e) {
+            System.out.println(e.getMessage());
+
+            return;
+        } catch (RequestException e) {
+            System.out.println(e.getMessage());
+
+            return;
+        }
+
+        //System.out.println("Logged in as " + account.getUserName() + " with user ID " + account.getUserId());
     }
 }

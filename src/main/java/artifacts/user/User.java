@@ -29,7 +29,7 @@ public class User {
     public User(String username) throws UserException {
         ObjectNode object = requester.sendRequestJson("https://users.roblox.com/v1/usernames/users", "POST", String.format("{\"usernames\": [\"%s\"]}", username));
 
-        if (object.get("data").isArray() && object.get("data").size() > 0) {
+        if (object.get("data").isArray() && !object.get("data").isEmpty()) {
             this.username = username;
             this.userId = object.get("data").get(0).get("id").asInt();
         } else {
@@ -50,7 +50,7 @@ public class User {
 
         ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/users/%d/groups/roles", this.userId), "GET", "");
 
-        if (object.get("data").isArray() && object.get("data").size() > 0) {
+        if (object.get("data").isArray() && !object.get("data").isEmpty()) {
             for (JsonNode array : object.get("data")) {
                 groups.add(new Group(array.get("group").get("id").asInt()));
             }
@@ -58,38 +58,4 @@ public class User {
 
         return groups;
     }
-
-    // 99.9% sure this wont work
-    public GroupRole getRankInGroup(Group group) throws GroupException {
-        ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/users/%d/groups/roles", group.getId()), "GET", "");
-
-        if (object.get("data").isArray() && object.get("data").size() > 0) {
-            for (JsonNode array : object.get("data")) {
-                if (array.get("group").get("id").asInt() == group.getGroupRole(this.getUsername()).getRoleId()) {
-                    if(object.get("role").isArray()) {
-                        return new GroupRole(array.get("id").asInt(), array.get("rank").asInt(), array.get("name").asText());
-                    }
-                }
-            }
-            return null;
-        }
-        throw new GroupException("The provided user is not in the provided group!");
-    }
-    public GroupRole getRankInGroup(int groupId) throws GroupException {
-        Group group = new Group(groupId);
-        ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/users/%d/groups/roles", group.getId()), "GET", "");
-
-        if (object.get("data").isArray() && object.get("data").size() > 0) {
-            for (JsonNode array : object.get("data")) {
-                if (array.get("group").get("id").asInt() == group.getGroupRole(this.getUsername()).getRoleId()) {
-                    if(object.get("role").isArray()) {
-                        return new GroupRole(array.get("id").asInt(), array.get("rank").asInt(), array.get("name").asText());
-                    }
-                }
-            }
-            return null;
-        }
-        throw new GroupException("The provided user is not in the provided group!");
-    }
-
 }

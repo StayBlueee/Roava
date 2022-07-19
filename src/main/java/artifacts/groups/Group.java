@@ -1,6 +1,6 @@
 package artifacts.groups;
 
-import artifacts.account.Account;
+import artifacts.client.Client;
 import artifacts.exceptions.GroupException;
 import artifacts.exceptions.RequestException;
 import artifacts.user.User;
@@ -27,8 +27,8 @@ public class Group {
         }
     }
 
-    public void setAccount(Account account) {
-        this.requester.setAccount(account);
+    public void setAccount(Client client) {
+        this.requester.setAccount(client);
     }
 
     public ArrayList<GroupRole> getGroupRoles() {
@@ -64,7 +64,7 @@ public class Group {
             ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v1/roles?ids=%d", roleNumber), "GET", "");
 
             // Check if it returned a valid response
-            if (object.get("data").isArray() && object.get("data").size() > 0) {
+            if (object.get("data").isArray() && !object.get("data").isEmpty()) {
                 JsonNode node = object.get("data").get(0);
 
                 // Check if the provided group role ID is linked to the same group
@@ -112,7 +112,7 @@ public class Group {
         Response<String> response = requester.sendRequest(String.format("https://groups.roblox.com/v1/groups/%d/users/%d", this.groupId, userId), "PATCH", String.format("{\"roleId\":%d}", roleSet));
 
         if (!response.isSuccessful()) {
-            throw new GroupException("Could not rank the provided user! " + response.status() + ": " + response.getBody());
+            throw new GroupException("Could not rank the provided user!");
         }
     }
 
@@ -134,6 +134,22 @@ public class Group {
 
     public void exileUser(User user) throws Exception {
         this.exileUser(user.getUserId());
+    }
+
+    public GroupRole getRankInGroup(int userId) throws GroupException {
+        ObjectNode object = requester.sendRequestJson(String.format("https://groups.roblox.com/v2/users/%d/groups/roles", userId), "GET", "");
+
+        if (object.get("data").isArray() && !object.get("data").isEmpty()) {
+            for (JsonNode array : object.get("data")) {
+                if (array.get("group").get("id").asInt() == this.groupId) {
+                    JsonNode role = array.get("role");
+
+                    return new GroupRole(role.get("id").asInt(), role.get("rank").asInt(), role.get("name").asText());
+                }
+            }
+        }
+
+        throw new GroupException("The provided user is not a part of this group!");
     }
 
     public String getName() {

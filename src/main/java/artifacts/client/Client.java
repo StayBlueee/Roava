@@ -1,10 +1,10 @@
-package artifacts.account;
+package artifacts.client;
 
 import artifacts.exceptions.AccountException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import misc.Requester;
 
-public class Account {
+public class Client {
     private String userName;
     private long userId;
     public Requester requester;
@@ -19,7 +19,7 @@ public class Account {
         return userId;
     }
 
-    public Account(String cookie) throws AccountException {
+    public Client(String cookie) throws AccountException {
         if (!cookie.toLowerCase().startsWith("_|warning:-")) {
             throw new AccountException("Your .ROBLOSECURITY is not set properly. Please make sure that you include the entirety of the string, including the _|WARNING:-");
         }
